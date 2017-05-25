@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 #include <cstring>
-#include <iostream>
 #include "agentcontroller.h"
 
 static AgentController* agentController;
@@ -30,7 +29,7 @@ void resourceExhausted(
 
    err = jvmti_env->RawMonitorEnter(monitorID);
    if (err != JVMTI_ERROR_NONE) {
-      std::cerr << "ERROR: RawMonitorEnter failed: " << err << std::endl;
+      fprintf(stderr, "ERROR: RawMonitorEnter failed: %d\n", err);
       return;
    }
 
@@ -38,16 +37,32 @@ void resourceExhausted(
 
    err = jvmti_env->RawMonitorExit(monitorID);
    if (err != JVMTI_ERROR_NONE) {
-      std::cerr << "ERROR: RawMonitorExit failed: " << err << std::endl;
+      fprintf(stderr, "ERROR: RawMonitorExit failed: %d\n", err);
    }
 }
 
 int setCallbacks(jvmtiEnv *jvmti) {
    jvmtiError err;
+   jvmtiCapabilities capa;
+   
+   err = jvmti->GetCapabilities(&capa);
+   if(err!=JVMTI_ERROR_NONE){
+     fprintf(stderr, "ERROR: GetPotentialCapabilities failed: %d\n", err);
+     return JNI_ERR;
+   }else {
+     capa.can_generate_resource_exhaustion_heap_events = 1;
+     capa.can_generate_resource_exhaustion_threads_events = 1;
+   }
+
+   err = jvmti->AddCapabilities(&capa);
+    if(err != JVMTI_ERROR_NONE) {
+      fprintf(stderr, "ERROR: AddCapabilities failed: %d\n", err);
+      return JNI_ERR;
+    }
 
    err = jvmti->CreateRawMonitor("jvmkillMonitor", &monitorID);
    if (err != JVMTI_ERROR_NONE) {
-      std::cerr << "ERROR: CreateRawMonitor failed: " << err << std::endl;
+      fprintf(stderr, "ERROR: CreateRawMonitor failed: %d\n", err);
       return JNI_ERR;
    }
 
@@ -58,13 +73,13 @@ int setCallbacks(jvmtiEnv *jvmti) {
 
    err = jvmti->SetEventCallbacks(&callbacks, sizeof(callbacks));
    if (err != JVMTI_ERROR_NONE) {
-      std::cerr << "ERROR: SetEventCallbacks failed: " << err << std::endl;
+      fprintf(stderr, "ERROR: SetEventCallbacks failed: %d\n", err);
       return JNI_ERR;
    }
 
    err = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_RESOURCE_EXHAUSTED, NULL);
    if (err != JVMTI_ERROR_NONE) {
-      std::cerr << "ERROR: SetEventNotificationMode failed: %d" << err << std::endl;
+      fprintf(stderr, "ERROR: SetEventNotificationMode failed: %d\n", err);
       return JNI_ERR;
    }
 
@@ -78,7 +93,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
 
    jint rc = vm->GetEnv((void **) &jvmti, JVMTI_VERSION);
    if (rc != JNI_OK) {
-      std::cerr << "ERROR: GetEnv failed: " << rc << std::endl;
+      fprintf(stderr, "ERROR: GetEnv failed: %d\n", rc);
       return JNI_ERR;
    }
    agentController = new AgentController(jvmti);
