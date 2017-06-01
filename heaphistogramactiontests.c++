@@ -32,12 +32,12 @@ jvmtiEnv *mockJvmtiEnv;
 
 static int MockGetCapabilitiesCount;
 static jvmtiError MockGetCapabilitiesReturnValue;
-jvmtiError (JNICALL MockGetCapabilities) (jvmtiEnv* env,
+/*jvmtiError (JNICALL MockGetCapabilities) (jvmtiEnv* env,
 	jvmtiCapabilities* capabilities) {
 	MockGetCapabilitiesCount++;
 	capabilities->can_generate_garbage_collection_events = 0;
 	return MockGetCapabilitiesReturnValue;
-}
+}*/
 
 static int MockAddCapabilitiesCount;
 static jvmtiError MockAddCapabilitiesReturnValue;
@@ -145,6 +145,14 @@ public:
    }
 };
 
+struct usable : public _jvmtiEnv {
+	jvmtiError GetCapabilities(jvmtiCapabilities* capabilities) override {
+   		MockGetCapabilitiesCount++;
+		capabilities->can_generate_garbage_collection_events = 0;
+		return MockGetCapabilitiesReturnValue;
+  	}
+};
+
 static MockHeapStatsFactory* MockHSFactory;
 
 void setup() {
@@ -156,7 +164,7 @@ void setup() {
 
 	MockGetCapabilitiesCount = 0;
 	MockGetCapabilitiesReturnValue = JVMTI_ERROR_NONE;
-	((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->GetCapabilities = &MockGetCapabilities;
+	// ((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->GetCapabilities = &MockGetCapabilities;
 
 	MockAddCapabilitiesCount = 0;
 	MockAddCapabilitiesReturnValue = JVMTI_ERROR_NONE;
