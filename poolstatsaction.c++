@@ -23,10 +23,9 @@
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
-#include <jvmti.h>
 #include <chrono>
 #include <thread>
-
+#include <jvmti.h>
 #include "poolstatsaction.h"
 
 PoolStatsAction::PoolStatsAction() {

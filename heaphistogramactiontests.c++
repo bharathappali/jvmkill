@@ -18,8 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
-#include <typeinfo>
-#include <sstream>
 
 #include "heaphistogramaction.h"
 #include "heapstats.h"
@@ -28,12 +26,9 @@ HeapHistogramAction* heapHistogramAction;
 
 JNIEnv* mockJNIEnv;
 
-bool ibmcheck;
-
-void *mockJvmtiInterface_1_;
+struct jvmtiInterface_1_ mockJvmtiInterface_1_;
 jvmtiEnv mockJvmtiEnvStruct;
 jvmtiEnv *mockJvmtiEnv;
-
 
 static int MockGetCapabilitiesCount;
 static jvmtiError MockGetCapabilitiesReturnValue;
@@ -150,86 +145,43 @@ public:
    }
 };
 
-/*struct usable : public _jvmtiEnv {
-	jvmtiError GetCapabilities(jvmtiCapabilities* capabilities) override {
-   		MockGetCapabilitiesCount++;
-		capabilities->can_generate_garbage_collection_events = 0;
-		return MockGetCapabilitiesReturnValue;
-  	}
-};*/
-
 static MockHeapStatsFactory* MockHSFactory;
 
 void setup() {
-
 	heapHistogramAction = NULL;
 
 	mockJNIEnv = 0;
-	printf("%s", "came here 3\n\n\n");
-	if(ibmcheck) {
-		mockJvmtiEnvStruct.functions = (struct JVMTINativeInterface_ *)mockJvmtiInterface_1_;
-	}else {
-		mockJvmtiEnvStruct.functions = (struct jvmtiInterface_1_ *)mockJvmtiInterface_1_;
-	}
+
+	mockJvmtiEnvStruct.functions = &mockJvmtiInterface_1_;
 
 	MockGetCapabilitiesCount = 0;
 	MockGetCapabilitiesReturnValue = JVMTI_ERROR_NONE;
-	if(ibmcheck) {
-		((struct JVMTINativeInterface_ *)mockJvmtiEnvStruct.functions)->GetCapabilities = &MockGetCapabilities;
-	}else {
-		((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->GetCapabilities = &MockGetCapabilities;
-	}
-
+	((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->GetCapabilities = &MockGetCapabilities;
 
 	MockAddCapabilitiesCount = 0;
 	MockAddCapabilitiesReturnValue = JVMTI_ERROR_NONE;
-	if(ibmcheck) {
-		((struct JVMTINativeInterface_ *)mockJvmtiEnvStruct.functions)->AddCapabilities = &MockAddCapabilities;
-	}else {
-		((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->AddCapabilities = &MockAddCapabilities;
-	}
-
+	((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->AddCapabilities = &MockAddCapabilities;
 
 	MockGetLoadedClassesCount = 0;
 	MockGetLoadedClassesReturnValue = JVMTI_ERROR_NONE;
-	if(ibmcheck) {
-		((struct JVMTINativeInterface_ *)mockJvmtiEnvStruct.functions)->GetLoadedClasses = &MockGetLoadedClasses;
-	}else {
-		((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->GetLoadedClasses = &MockGetLoadedClasses;
-	}
+	((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->GetLoadedClasses = &MockGetLoadedClasses;
 
 	MockSetTagReturnValue = JVMTI_ERROR_NONE;
-	if(ibmcheck) {
-		((struct JVMTINativeInterface_ *)mockJvmtiEnvStruct.functions)->SetTag = &MockSetTag;
-	}else {
-		((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->SetTag = &MockSetTag;
-	}
+	((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->SetTag = &MockSetTag;
 
 	MockGetClassSignatureCount = 0;
 	MockGetClassSignatureResult = NULL;
 	MockGetClassSignatureReturnValue = JVMTI_ERROR_NONE;
-	if(ibmcheck) {
-		((struct JVMTINativeInterface_ *)mockJvmtiEnvStruct.functions)->GetClassSignature = &MockGetClassSignature;
-	}else {
-		((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->GetClassSignature = &MockGetClassSignature;
-	}
+	((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->GetClassSignature = &MockGetClassSignature;
 
 	MockDeallocateCount = 0;
 	MockDeallocateReturnValue = JVMTI_ERROR_NONE;
-	if(ibmcheck) {
-		((struct JVMTINativeInterface_ *)mockJvmtiEnvStruct.functions)->Deallocate = &MockDeallocate;
-	}else {
-		((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->Deallocate = &MockDeallocate;
-	}
+	((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->Deallocate = &MockDeallocate;
 
 	MockFollowReferencesCount = 0;
 	MockFollowReferencesReturnValue = JVMTI_ERROR_NONE;
 	MockFollowReferencesAction = NULL;
-	if(ibmcheck) {
-		((struct JVMTINativeInterface_ *)mockJvmtiEnvStruct.functions)->FollowReferences = &MockFollowReferences;
-	}else {
-		((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->FollowReferences = &MockFollowReferences;
-	}
+	((struct jvmtiInterface_1_ *)mockJvmtiEnvStruct.functions)->FollowReferences = &MockFollowReferences;
 
 	mockJvmtiEnv = &mockJvmtiEnvStruct;
 
@@ -521,19 +473,6 @@ bool testHeapReferenceCallbackCallsRecordObject() {
 }
 
 int main() {
-	std::stringstream sstream;
-	printf("%s", "came here 1\n\n\n");
-	sstream << typeid(mockJvmtiEnvStruct.functions).name();
-	printf("%s", "came here 2\n\n\n");
-	std::string typeoffunc = sstream.str();
-	ibmcheck = false;
-	if(typeoffunc.find("JVMTINativeInterface_") != std::string::npos) {
-		ibmcheck = true;
-		mockJvmtiInterface_1_ = (void *)new (struct JVMTINativeInterface_);
-	}else{
-		ibmcheck = false;
-		mockJvmtiInterface_1_ = (void *)new (struct jvmtiInterface_1_);
-	}
 	bool result = (testConstructionOk() &&
 						testConstructionGetCapabilitiesFailure() &&
 						testConstructionAddCapabilitiesFailure() &&
