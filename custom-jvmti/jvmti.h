@@ -150,54 +150,13 @@ typedef enum {
 
     /* Event IDs */
 
-typedef enum {
-    JVMTI_MIN_EVENT_TYPE_VAL = 50,
-    JVMTI_EVENT_VM_INIT = 50,
-    JVMTI_EVENT_VM_DEATH = 51,
-    JVMTI_EVENT_THREAD_START = 52,
-    JVMTI_EVENT_THREAD_END = 53,
-    JVMTI_EVENT_CLASS_FILE_LOAD_HOOK = 54,
-    JVMTI_EVENT_CLASS_LOAD = 55,
-    JVMTI_EVENT_CLASS_PREPARE = 56,
-    JVMTI_EVENT_VM_START = 57,
-    JVMTI_EVENT_EXCEPTION = 58,
-    JVMTI_EVENT_EXCEPTION_CATCH = 59,
-    JVMTI_EVENT_SINGLE_STEP = 60,
-    JVMTI_EVENT_FRAME_POP = 61,
-    JVMTI_EVENT_BREAKPOINT = 62,
-    JVMTI_EVENT_FIELD_ACCESS = 63,
-    JVMTI_EVENT_FIELD_MODIFICATION = 64,
-    JVMTI_EVENT_METHOD_ENTRY = 65,
-    JVMTI_EVENT_METHOD_EXIT = 66,
-    JVMTI_EVENT_NATIVE_METHOD_BIND = 67,
-    JVMTI_EVENT_COMPILED_METHOD_LOAD = 68,
-    JVMTI_EVENT_COMPILED_METHOD_UNLOAD = 69,
-    JVMTI_EVENT_DYNAMIC_CODE_GENERATED = 70,
-    JVMTI_EVENT_DATA_DUMP_REQUEST = 71,
-    JVMTI_EVENT_MONITOR_WAIT = 73,
-    JVMTI_EVENT_MONITOR_WAITED = 74,
-    JVMTI_EVENT_MONITOR_CONTENDED_ENTER = 75,
-    JVMTI_EVENT_MONITOR_CONTENDED_ENTERED = 76,
-    JVMTI_EVENT_RESOURCE_EXHAUSTED = 80,
-    JVMTI_EVENT_GARBAGE_COLLECTION_START = 81,
-    JVMTI_EVENT_GARBAGE_COLLECTION_FINISH = 82,
-    JVMTI_EVENT_OBJECT_FREE = 83,
-    JVMTI_EVENT_VM_OBJECT_ALLOC = 84,
-    JVMTI_MAX_EVENT_TYPE_VAL = 84
-} jvmtiEvent;
+
 
 
     /* Pre-Declarations */
-struct _jvmtiThreadInfo;
-typedef struct _jvmtiThreadInfo jvmtiThreadInfo;
-struct _jvmtiMonitorStackDepthInfo;
-typedef struct _jvmtiMonitorStackDepthInfo jvmtiMonitorStackDepthInfo;
-struct _jvmtiThreadGroupInfo;
-typedef struct _jvmtiThreadGroupInfo jvmtiThreadGroupInfo;
-struct _jvmtiFrameInfo;
-typedef struct _jvmtiFrameInfo jvmtiFrameInfo;
-struct _jvmtiStackInfo;
-typedef struct _jvmtiStackInfo jvmtiStackInfo;
+
+struct _jvmtiHeapCallbacks;
+typedef struct _jvmtiHeapCallbacks jvmtiHeapCallbacks;
 struct _jvmtiHeapReferenceInfoField;
 typedef struct _jvmtiHeapReferenceInfoField jvmtiHeapReferenceInfoField;
 struct _jvmtiHeapReferenceInfoArray;
@@ -212,97 +171,20 @@ struct _jvmtiHeapReferenceInfoReserved;
 typedef struct _jvmtiHeapReferenceInfoReserved jvmtiHeapReferenceInfoReserved;
 union _jvmtiHeapReferenceInfo;
 typedef union _jvmtiHeapReferenceInfo jvmtiHeapReferenceInfo;
-struct _jvmtiHeapCallbacks;
-typedef struct _jvmtiHeapCallbacks jvmtiHeapCallbacks;
-struct _jvmtiClassDefinition;
-typedef struct _jvmtiClassDefinition jvmtiClassDefinition;
-struct _jvmtiMonitorUsage;
-typedef struct _jvmtiMonitorUsage jvmtiMonitorUsage;
-struct _jvmtiLineNumberEntry;
-typedef struct _jvmtiLineNumberEntry jvmtiLineNumberEntry;
-struct _jvmtiLocalVariableEntry;
-typedef struct _jvmtiLocalVariableEntry jvmtiLocalVariableEntry;
-struct _jvmtiParamInfo;
-typedef struct _jvmtiParamInfo jvmtiParamInfo;
-struct _jvmtiExtensionFunctionInfo;
-typedef struct _jvmtiExtensionFunctionInfo jvmtiExtensionFunctionInfo;
-struct _jvmtiExtensionEventInfo;
-typedef struct _jvmtiExtensionEventInfo jvmtiExtensionEventInfo;
-struct _jvmtiTimerInfo;
-typedef struct _jvmtiTimerInfo jvmtiTimerInfo;
-struct _jvmtiAddrLocationMap;
-typedef struct _jvmtiAddrLocationMap jvmtiAddrLocationMap;
+
 
     /* Function Types */
 
-typedef void (JNICALL *jvmtiStartFunction)
-    (jvmtiEnv* jvmti_env, JNIEnv* jni_env, void* arg);
-
-typedef jint (JNICALL *jvmtiHeapIterationCallback)
-    (jlong class_tag, jlong size, jlong* tag_ptr, jint length, void* user_data);
 
 typedef jint (JNICALL *jvmtiHeapReferenceCallback)
     (jvmtiHeapReferenceKind reference_kind, const jvmtiHeapReferenceInfo* reference_info, jlong class_tag, jlong referrer_class_tag, jlong size, jlong* tag_ptr, jlong* referrer_tag_ptr, jint length, void* user_data);
 
-typedef jint (JNICALL *jvmtiPrimitiveFieldCallback)
-    (jvmtiHeapReferenceKind kind, const jvmtiHeapReferenceInfo* info, jlong object_class_tag, jlong* object_tag_ptr, jvalue value, jvmtiPrimitiveType value_type, void* user_data);
 
-typedef jint (JNICALL *jvmtiArrayPrimitiveValueCallback)
-    (jlong class_tag, jlong size, jlong* tag_ptr, jint element_count, jvmtiPrimitiveType element_type, const void* elements, void* user_data);
 
-typedef jint (JNICALL *jvmtiStringPrimitiveValueCallback)
-    (jlong class_tag, jlong size, jlong* tag_ptr, const jchar* value, jint value_length, void* user_data);
 
-typedef jint (JNICALL *jvmtiReservedCallback)
-    ();
-
-typedef jvmtiIterationControl (JNICALL *jvmtiHeapObjectCallback)
-    (jlong class_tag, jlong size, jlong* tag_ptr, void* user_data);
-
-typedef jvmtiIterationControl (JNICALL *jvmtiHeapRootCallback)
-    (jvmtiHeapRootKind root_kind, jlong class_tag, jlong size, jlong* tag_ptr, void* user_data);
-
-typedef jvmtiIterationControl (JNICALL *jvmtiStackReferenceCallback)
-    (jvmtiHeapRootKind root_kind, jlong class_tag, jlong size, jlong* tag_ptr, jlong thread_tag, jint depth, jmethodID method, jint slot, void* user_data);
-
-typedef jvmtiIterationControl (JNICALL *jvmtiObjectReferenceCallback)
-    (jvmtiObjectReferenceKind reference_kind, jlong class_tag, jlong size, jlong* tag_ptr, jlong referrer_tag, jint referrer_index, void* user_data);
-
-typedef jvmtiError (JNICALL *jvmtiExtensionFunction)
-    (jvmtiEnv* jvmti_env,  ...);
-
-typedef void (JNICALL *jvmtiExtensionEvent)
-    (jvmtiEnv* jvmti_env,  ...);
 
 
     /* Structure Types */
-struct _jvmtiThreadInfo {
-    char* name;
-    jint priority;
-    jboolean is_daemon;
-    jthreadGroup thread_group;
-    jobject context_class_loader;
-};
-struct _jvmtiMonitorStackDepthInfo {
-    jobject monitor;
-    jint stack_depth;
-};
-struct _jvmtiThreadGroupInfo {
-    jthreadGroup parent;
-    char* name;
-    jint max_priority;
-    jboolean is_daemon;
-};
-struct _jvmtiFrameInfo {
-    jmethodID method;
-    jlocation location;
-};
-struct _jvmtiStackInfo {
-    jthread thread;
-    jint state;
-    jvmtiFrameInfo* frame_buffer;
-    jint frame_count;
-};
 struct _jvmtiHeapReferenceInfoField {
     jint index;
 };
@@ -345,82 +227,10 @@ union _jvmtiHeapReferenceInfo {
     jvmtiHeapReferenceInfoReserved other;
 };
 struct _jvmtiHeapCallbacks {
-    jvmtiHeapIterationCallback heap_iteration_callback;
+
     jvmtiHeapReferenceCallback heap_reference_callback;
-    jvmtiPrimitiveFieldCallback primitive_field_callback;
-    jvmtiArrayPrimitiveValueCallback array_primitive_value_callback;
-    jvmtiStringPrimitiveValueCallback string_primitive_value_callback;
-    jvmtiReservedCallback reserved5;
-    jvmtiReservedCallback reserved6;
-    jvmtiReservedCallback reserved7;
-    jvmtiReservedCallback reserved8;
-    jvmtiReservedCallback reserved9;
-    jvmtiReservedCallback reserved10;
-    jvmtiReservedCallback reserved11;
-    jvmtiReservedCallback reserved12;
-    jvmtiReservedCallback reserved13;
-    jvmtiReservedCallback reserved14;
-    jvmtiReservedCallback reserved15;
 };
-struct _jvmtiClassDefinition {
-    jclass klass;
-    jint class_byte_count;
-    const unsigned char* class_bytes;
-};
-struct _jvmtiMonitorUsage {
-    jthread owner;
-    jint entry_count;
-    jint waiter_count;
-    jthread* waiters;
-    jint notify_waiter_count;
-    jthread* notify_waiters;
-};
-struct _jvmtiLineNumberEntry {
-    jlocation start_location;
-    jint line_number;
-};
-struct _jvmtiLocalVariableEntry {
-    jlocation start_location;
-    jint length;
-    char* name;
-    char* signature;
-    char* generic_signature;
-    jint slot;
-};
-struct _jvmtiParamInfo {
-    char* name;
-    jvmtiParamKind kind;
-    jvmtiParamTypes base_type;
-    jboolean null_ok;
-};
-struct _jvmtiExtensionFunctionInfo {
-    jvmtiExtensionFunction func;
-    char* id;
-    char* short_description;
-    jint param_count;
-    jvmtiParamInfo* params;
-    jint error_count;
-    jvmtiError* errors;
-};
-struct _jvmtiExtensionEventInfo {
-    jint extension_event_index;
-    char* id;
-    char* short_description;
-    jint param_count;
-    jvmtiParamInfo* params;
-};
-struct _jvmtiTimerInfo {
-    jlong max_value;
-    jboolean may_skip_forward;
-    jboolean may_skip_backward;
-    jvmtiTimerKind kind;
-    jlong reserved1;
-    jlong reserved2;
-};
-struct _jvmtiAddrLocationMap {
-    const void* start_address;
-    jlocation location;
-};
+
 
 typedef struct {
     unsigned int can_tag_objects : 1;
