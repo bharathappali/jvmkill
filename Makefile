@@ -10,9 +10,11 @@ else
   LINK= -Wl,--no-as-needed,-soname=libJvmKill -static-libgcc
 endif
 
+INCLUDE_CUSTOMJVMTI= -I "custom-jvmti"
 CPPFLAGS=-Wall -Werror -fPIC -std=c++11 -fno-strict-aliasing $(LINK) -fno-omit-frame-pointer $(INCLUDE)
 CPPFLAGS_SO=$(CPPFLAGS) -shared
 CPPFLAGS_TEST=$(CPPFLAGS) -ldl
+CPPFLAGS_HEAPHISTOGRAMTESTS=-Wall -Werror -fPIC -std=c++11 -fno-strict-aliasing $(LINK) -fno-omit-frame-pointer $(INCLUDE_CUSTOMJVMTI) $(INCLUDE)
 TARGET=libjvmkill.so
 
 .PHONY: all build clean alltests ctests threadtests threadtestbasic threadtest0 threadtest-10-2 memtests memtest0 memtest-10-2
@@ -49,7 +51,7 @@ agentcontrollerctests:
 	./agentcontrollertests
 
 heaphistogramactionctests:
-	g++ $(CPPFLAGS_TEST) -o heaphistogramactiontests heaphistogramactiontests.c++ heaphistogramaction.c++
+	g++ $(CPPFLAGS_HEAPHISTOGRAMTESTS) -o heaphistogramactiontests heaphistogramactiontests.c++ heaphistogramaction.c++
 	./heaphistogramactiontests
 
 heapstatsctests:

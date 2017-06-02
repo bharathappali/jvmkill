@@ -326,7 +326,7 @@ bool testHeapStatsTagsClassesReturnedByGetLoadedClasses() {
 						(MockSetTagTagsSet[1] == 2));
 
 	if (!passed) {
-		fprintf(stdout, "tags %ld %ld\n", MockSetTagTagsSet[0], MockSetTagTagsSet[1]);
+		fprintf(stdout, "tags %lld %lld\n", MockSetTagTagsSet[0], MockSetTagTagsSet[1]);
 		fprintf(stdout, "testHeapStatsTagsClassesReturnedByGetLoadedClasses FAILED\n");
 	}
 
